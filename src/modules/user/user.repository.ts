@@ -6,7 +6,7 @@ import { User } from './user.entity';
 
 @Injectable()
 export class UserRepository extends BaseRepository<User> {
-  constructor(tenantProvider: TenantProvider, manager: EntityManager) {
-    super(tenantProvider, User, manager);
+  constructor(tenantProvider: TenantProvider, entityManager: EntityManager) {
+    super(tenantProvider, User, entityManager);
   }
 }

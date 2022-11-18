@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { EntityManager } from 'typeorm';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './modules/user/user.module';
 
@@ -9,5 +9,5 @@ import { UsersModule } from './modules/user/user.module';
   providers: [],
 })
 export class AppModule {
-  constructor(private dataSource: DataSource) {}
+  constructor(private entityManager: EntityManager) {}
 }

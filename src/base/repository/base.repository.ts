@@ -1,11 +1,5 @@
-// import { Injectable } from '@nestjs/common';
 import { TenantProvider } from 'src/providers/tenant.provider';
-import {
-  EntityManager,
-  Repository,
-  EntityTarget,
-  FindOneOptions,
-} from 'typeorm';
+import { EntityManager, EntityTarget, Repository } from 'typeorm';
 import { IBaseRepository } from './base.repository.interface';
 
 export class BaseRepository<E>
@@ -15,17 +9,16 @@ export class BaseRepository<E>
   constructor(
     private readonly tenantProvider: TenantProvider,
     target: EntityTarget<E>,
-    manager: EntityManager,
+    entityManager: EntityManager,
   ) {
-    super(target, manager);
+    super(target, entityManager);
   }
 
-  createEntity(entity: E): E {
-    return this.create(entity);
-  }
-
-  async findOneByCondition(options: FindOneOptions<E>): Promise<E> {
-    return await this.findOne(options);
+  async createEntity(entity: E) {
+    console.log('base repository');
+    const a = this.test();
+    console.log(a);
+    await super.save(entity);
   }
 
   test() {
