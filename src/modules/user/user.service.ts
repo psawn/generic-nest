@@ -10,6 +10,9 @@ export class UsersService {
   }
 
   async getUser() {
-    return this.userRepository.test();
+    this.userRepository.test();
+    return await this.userRepository.findOneByCondition({
+      where: { tenantId: '1' },
+    });
   }
 }
