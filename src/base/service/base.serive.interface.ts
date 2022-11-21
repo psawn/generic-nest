@@ -1,3 +1,6 @@
+import { GetEntitiesDto } from '../dto';
+
 export interface IBaseService<E> {
-  createUser(entity: E);
+  createEntity(entity: E): Promise<E>;
+  getEntities(getEntitiesDto: GetEntitiesDto): Promise<E[]>;
 }

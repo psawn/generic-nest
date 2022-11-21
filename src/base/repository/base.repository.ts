@@ -1,5 +1,7 @@
+import { dynamicFilter } from 'src/modules/dynamic-filter/dynamic-filter';
 import { TenantProvider } from 'src/providers/tenant.provider';
 import { EntityManager, EntityTarget, Repository } from 'typeorm';
+import { GetEntitiesDto } from '../dto';
 import { IBaseRepository } from './base.repository.interface';
 
 export class BaseRepository<E>
@@ -18,7 +20,15 @@ export class BaseRepository<E>
     console.log('base repository');
     const a = this.test();
     console.log(a);
-    await super.save(entity);
+    return await super.save(entity);
+  }
+
+  async getEntities(getEntitiesDto: GetEntitiesDto) {
+    const query = dynamicFilter(
+      JSON.parse(getEntitiesDto.filter),
+      this.createQueryBuilder(),
+    );
+    return query.getMany();
   }
 
   test() {

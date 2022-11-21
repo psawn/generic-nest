@@ -5,6 +5,12 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   uid: string;
 
-  @Column()
+  @Column({ name: 'name' })
   name: string;
+
+  @Column({ name: 'email' })
+  email: string;
+
+  @Column({ name: 'age', default: 0 })
+  age: number;
 }
