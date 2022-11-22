@@ -1,7 +1,15 @@
+import { Type } from '@nestjs/common';
 import { dynamicFilter } from 'src/modules/dynamic-filter/dynamic-filter';
 import { TenantProvider } from 'src/providers/tenant.provider';
-import { EntityManager, EntityTarget, Repository } from 'typeorm';
-import { GetEntitiesDto } from '../dto';
+import {
+  DeepPartial,
+  EntityManager,
+  EntityTarget,
+  FindOptionsWhere,
+  Repository,
+} from 'typeorm';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { CreateEntityDto, GetEntitiesDto } from '../dto';
 import { IBaseRepository } from './base.repository.interface';
 
 export class BaseRepository<E>
@@ -16,11 +24,11 @@ export class BaseRepository<E>
     super(target, entityManager);
   }
 
-  async createEntity(entity: E) {
+  async createEntity(createEntityDto: Type<CreateEntityDto>): Promise<E> {
     console.log('base repository');
-    const a = this.test();
-    console.log(a);
-    return await super.save(entity);
+    const entity: E = this.create({ ...createEntityDto } as DeepPartial<E>);
+    this.test();
+    return await this.save(entity);
   }
 
   async getEntities(getEntitiesDto: GetEntitiesDto) {
@@ -28,7 +36,24 @@ export class BaseRepository<E>
       JSON.parse(getEntitiesDto.filter),
       this.createQueryBuilder(),
     );
-    return query.getMany();
+    return await query.getMany();
+  }
+
+  async getEntity(criteria: FindOptionsWhere<E>) {
+    return await this.findOne({
+      where: criteria,
+    });
+  }
+
+  async updateEntity(
+    criteria: FindOptionsWhere<E>,
+    partialEntity: QueryDeepPartialEntity<E>,
+  ) {
+    await this.update(criteria, partialEntity);
+  }
+
+  private dynamicFilter() {
+    //
   }
 
   test() {

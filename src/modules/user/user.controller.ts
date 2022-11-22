@@ -1,10 +1,15 @@
 import { Controller } from '@nestjs/common';
-import { BaseController } from 'src/base/controller/base.controller';
+import { ApiTags } from '@nestjs/swagger';
+import { BaseControllerFactory } from 'src/base/controller/base.controller';
+import { CreateUserDto } from './dto';
 import { User } from './user.entity';
 import { UsersService } from './user.service';
 
-@Controller()
-export class UsersController extends BaseController<User> {
+@ApiTags('Users')
+@Controller('users')
+export class UsersController extends BaseControllerFactory<User>(
+  CreateUserDto,
+) {
   constructor(private readonly userService: UsersService) {
     super(userService);
   }

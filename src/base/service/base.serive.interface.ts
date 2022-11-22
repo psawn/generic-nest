@@ -1,6 +1,7 @@
-import { GetEntitiesDto } from '../dto';
+import { Type } from '@nestjs/common';
+import { CreateEntityDto, GetEntitiesDto } from '../dto';
 
 export interface IBaseService<E> {
-  createEntity(entity: E): Promise<E>;
+  createEntity(createEntityDto: Type<CreateEntityDto>): Promise<E>;
   getEntities(getEntitiesDto: GetEntitiesDto): Promise<E[]>;
 }
