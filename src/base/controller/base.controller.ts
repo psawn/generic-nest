@@ -1,6 +1,7 @@
 import {
   ArgumentMetadata,
   Body,
+  Delete,
   Get,
   Injectable,
   Param,
@@ -14,6 +15,7 @@ import {
   ValidationPipeOptions,
 } from '@nestjs/common';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
+import { DeleteResult } from 'typeorm';
 import { CreateEntityDto, GetEntitiesDto, UpdateEntityDto } from '../dto';
 import { BaseService } from '../service/base.service';
 import { IBaseController } from './base.controller.interface';
@@ -45,6 +47,7 @@ export class AbstractValidationPipe extends ValidationPipe {
 
 export function BaseControllerFactory<E>(
   createEntityDto: typeof CreateEntityDto,
+  updateEntityDto: typeof UpdateEntityDto,
 ): Type<IBaseController<E>> {
   const createPipe = new AbstractValidationPipe(
     { whitelist: true, transform: true },
@@ -77,11 +80,20 @@ export function BaseControllerFactory<E>(
 
     @Patch('/:id')
     @ApiOperation({ summary: 'Update entity' })
+    @ApiBody({ type: updateEntityDto })
     async updateEntity(
       @Param('id', ParseUUIDPipe) id: string,
       @Body(ValidationPipe) updateEntityDto: UpdateEntityDto,
     ) {
       return this.baseService.updateEntity(id, updateEntityDto);
+    }
+
+    @Delete('/:id')
+    @ApiOperation({ summary: 'Delete entity' })
+    async deleteEntity(
+      @Param('id', ParseUUIDPipe) id: string,
+    ): Promise<DeleteResult> {
+      return this.baseService.deleteEntity(id);
     }
   }
 

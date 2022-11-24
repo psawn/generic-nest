@@ -1,3 +1,4 @@
+import { PaginationConstants } from 'src/common/constants';
 import {
   Any,
   Between,
@@ -26,6 +27,9 @@ export function dynamicFilter<T extends ObjectLiteral>(
   query: IFilterOption,
   repo: Repository<T> | SelectQueryBuilder<T>,
 ) {
+  const page = +query.page || PaginationConstants.DEFAULT_PAGE;
+  const limit = +query.limit || PaginationConstants.DEFAULT_LIMIT_ITEM;
+  const offset = (page - 1) * limit;
   const { filters, sorts } = query;
 
   let queryBuilder: SelectQueryBuilder<T>;
@@ -66,6 +70,8 @@ export function dynamicFilter<T extends ObjectLiteral>(
       queryBuilder.addOrderBy(sort.field, sort.dir);
     }
   }
+
+  queryBuilder.take(limit).skip(offset);
 
   return queryBuilder;
 }

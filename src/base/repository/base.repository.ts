@@ -1,23 +1,29 @@
-import { Type } from '@nestjs/common';
+import { Inject, Type } from '@nestjs/common';
 import { dynamicFilter } from 'src/modules/dynamic-filter/dynamic-filter';
+import { IFilterOption } from 'src/modules/dynamic-filter/dynamic-filter.interface';
 import { TenantProvider } from 'src/providers/tenant.provider';
 import {
   DeepPartial,
+  DeleteResult,
   EntityManager,
   EntityTarget,
   FindOptionsWhere,
   Repository,
+  SelectQueryBuilder,
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { CreateEntityDto, GetEntitiesDto } from '../dto';
+import { CreateEntityDto } from '../dto';
 import { IBaseRepository } from './base.repository.interface';
 
 export class BaseRepository<E>
   extends Repository<E>
   implements IBaseRepository<E>
 {
+  @Inject()
+  private readonly tenantProvider: TenantProvider;
+
   constructor(
-    private readonly tenantProvider: TenantProvider,
+    // private readonly tenantProvider: TenantProvider,
     target: EntityTarget<E>,
     entityManager: EntityManager,
   ) {
@@ -31,12 +37,13 @@ export class BaseRepository<E>
     return await this.save(entity);
   }
 
-  async getEntities(getEntitiesDto: GetEntitiesDto) {
-    const query = dynamicFilter(
-      JSON.parse(getEntitiesDto.filter),
-      this.createQueryBuilder(),
-    );
-    return await query.getMany();
+  toQueryBuilder(filter: IFilterOption) {
+    return dynamicFilter(filter, this.createQueryBuilder());
+  }
+
+  async getEntities(query: SelectQueryBuilder<E>) {
+    const result = await query.getManyAndCount();
+    return result;
   }
 
   async getEntity(criteria: FindOptionsWhere<E>) {
@@ -49,15 +56,15 @@ export class BaseRepository<E>
     criteria: FindOptionsWhere<E>,
     partialEntity: QueryDeepPartialEntity<E>,
   ) {
-    await this.update(criteria, partialEntity);
+    return await this.update(criteria, partialEntity);
   }
 
-  private dynamicFilter() {
-    //
+  async deleteEntity(id: string): Promise<DeleteResult> {
+    throw new Error('Method not implemented.');
   }
 
   test() {
     const a = this.tenantProvider.tenantId;
-    console.log('a', a);
+    console.log('call test function', a);
   }
 }

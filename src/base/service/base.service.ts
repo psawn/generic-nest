@@ -1,5 +1,7 @@
 import { Type } from '@nestjs/common';
-import { FindOptionsWhere } from 'typeorm';
+import { PaginationConstants } from 'src/common/constants';
+import { IFilterOption } from 'src/modules/dynamic-filter/dynamic-filter.interface';
+import { DeleteResult, FindOptionsWhere } from 'typeorm';
 import { CreateEntityDto, GetEntitiesDto, UpdateEntityDto } from '../dto';
 import { BaseRepository } from '../repository/base.repository';
 import { IBaseService } from './base.serive.interface';
@@ -14,7 +16,24 @@ export class BaseService<E> implements IBaseService<E> {
   }
 
   async getEntities(getEntitiesDto: GetEntitiesDto) {
-    return this.baseRepository.getEntities(getEntitiesDto);
+    const filter: IFilterOption = JSON.parse(getEntitiesDto.filter);
+    const page = +filter.page || PaginationConstants.DEFAULT_PAGE;
+    const limit = +filter.limit || PaginationConstants.DEFAULT_LIMIT_ITEM;
+
+    const query = this.baseRepository.toQueryBuilder(filter);
+
+    const [items, totalItems] = await this.baseRepository.getEntities(query);
+
+    return {
+      items,
+      pagination: {
+        totalItems,
+        itemCount: items.length,
+        itemsPerPage: +limit,
+        totalPages: Math.ceil(totalItems / limit),
+        currentPage: +page,
+      },
+    };
   }
 
   async getEntity(id: string) {
@@ -25,5 +44,9 @@ export class BaseService<E> implements IBaseService<E> {
   async updateEntity(id: string, updateEntityDto: UpdateEntityDto) {
     const criteria = { id } as unknown as FindOptionsWhere<E>;
     return this.baseRepository.updateEntity(criteria, { ...updateEntityDto });
+  }
+
+  async deleteEntity(id: string): Promise<DeleteResult> {
+    return this.baseRepository.deleteEntity(id);
   }
 }
