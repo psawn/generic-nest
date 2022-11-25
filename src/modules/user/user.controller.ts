@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { BaseControllerFactory } from 'src/base/controller/base.controller';
-import { CreateUserDto, UpdateUserDto } from './dto';
+import { CreateUserDto, UpdateUserDto, UserToViewDto } from './dto';
 import { User } from './user.entity';
 import { UsersService } from './user.service';
 
@@ -10,6 +10,7 @@ import { UsersService } from './user.service';
 export class UsersController extends BaseControllerFactory<User>(
   CreateUserDto,
   UpdateUserDto,
+  UserToViewDto,
 ) {
   constructor(private readonly userService: UsersService) {
     super(userService);

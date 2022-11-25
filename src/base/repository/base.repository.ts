@@ -12,7 +12,7 @@ import {
   SelectQueryBuilder,
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { CreateEntityDto } from '../dto';
+import { CreateEntityDto } from '../dtos';
 import { IBaseRepository } from './base.repository.interface';
 
 export class BaseRepository<E>

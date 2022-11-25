@@ -1,8 +1,8 @@
-import { Type } from '@nestjs/common';
+import { NotFoundException, Type } from '@nestjs/common';
 import { PaginationConstants } from 'src/common/constants';
 import { IFilterOption } from 'src/modules/dynamic-filter/dynamic-filter.interface';
 import { DeleteResult, FindOptionsWhere } from 'typeorm';
-import { CreateEntityDto, GetEntitiesDto, UpdateEntityDto } from '../dto';
+import { CreateEntityDto, GetEntitiesDto, UpdateEntityDto } from '../dtos';
 import { BaseRepository } from '../repository/base.repository';
 import { IBaseService } from './base.serive.interface';
 
@@ -38,7 +38,13 @@ export class BaseService<E> implements IBaseService<E> {
 
   async getEntity(id: string) {
     const criteria = { id } as unknown as FindOptionsWhere<E>;
-    return this.baseRepository.getEntity(criteria);
+    const entity = this.baseRepository.getEntity(criteria);
+
+    if (!entity) {
+      throw new NotFoundException('Not found');
+    }
+
+    return entity;
   }
 
   async updateEntity(id: string, updateEntityDto: UpdateEntityDto) {

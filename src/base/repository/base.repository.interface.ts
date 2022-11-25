@@ -6,7 +6,7 @@ import {
   UpdateResult,
 } from 'typeorm';
 import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import { CreateEntityDto } from '../dto';
+import { CreateEntityDto } from '../dtos';
 
 export interface IBaseRepository<E> {
   createEntity(createEntityDto: Type<CreateEntityDto>): Promise<E>;

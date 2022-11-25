@@ -16,7 +16,13 @@ import {
 } from '@nestjs/common';
 import { ApiBody, ApiOperation } from '@nestjs/swagger';
 import { DeleteResult } from 'typeorm';
-import { CreateEntityDto, GetEntitiesDto, UpdateEntityDto } from '../dto';
+import {
+  CreateEntityDto,
+  GetEntitiesDto,
+  UpdateEntityDto,
+  EntityToViewDto,
+  ViewDtoContructor,
+} from '../dtos';
 import { BaseService } from '../service/base.service';
 import { IBaseController } from './base.controller.interface';
 
@@ -48,13 +54,18 @@ export class AbstractValidationPipe extends ValidationPipe {
 export function BaseControllerFactory<E>(
   createEntityDto: typeof CreateEntityDto,
   updateEntityDto: typeof UpdateEntityDto,
+  // entityToViewDto: typeof EntityToViewDto,
+  entityToViewDto: ViewDtoContructor<E>,
 ): Type<IBaseController<E>> {
   const createPipe = new AbstractValidationPipe(
     { whitelist: true, transform: true },
     { body: createEntityDto as unknown as Type<any> },
   );
-
-  class BaseController<E> implements IBaseController<E> {
+  const updatePipe = new AbstractValidationPipe(
+    { whitelist: true, transform: true },
+    { body: updateEntityDto as unknown as Type<any> },
+  );
+  class BaseController implements IBaseController<E> {
     constructor(private readonly baseService: BaseService<E>) {}
 
     @Post()
@@ -63,7 +74,8 @@ export function BaseControllerFactory<E>(
     @ApiBody({ type: createEntityDto })
     async createEntity(@Body(ValidationPipe) dto: Type<CreateEntityDto>) {
       console.log('base controller');
-      return this.baseService.createEntity(dto);
+      const entity = await this.baseService.createEntity(dto);
+      return new entityToViewDto(entity);
     }
 
     @Get()
@@ -75,10 +87,12 @@ export function BaseControllerFactory<E>(
     @Get('/:id')
     @ApiOperation({ summary: 'Get entity' })
     async getEntity(@Param('id', ParseUUIDPipe) id: string) {
-      return this.baseService.getEntity(id);
+      const entity = await this.baseService.getEntity(id);
+      return new entityToViewDto(entity);
     }
 
     @Patch('/:id')
+    @UsePipes(updatePipe)
     @ApiOperation({ summary: 'Update entity' })
     @ApiBody({ type: updateEntityDto })
     async updateEntity(

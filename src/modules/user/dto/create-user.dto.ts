@@ -7,7 +7,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { CreateEntityDto } from 'src/base/dto';
+import { CreateEntityDto } from 'src/base/dtos';
 
 export class CreateUserDto extends CreateEntityDto {
   @IsNotEmpty()

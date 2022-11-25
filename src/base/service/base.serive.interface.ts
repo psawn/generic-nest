@@ -1,6 +1,6 @@
 import { Type } from '@nestjs/common';
 import { DeleteResult, UpdateResult } from 'typeorm';
-import { CreateEntityDto, GetEntitiesDto, UpdateEntityDto } from '../dto';
+import { CreateEntityDto, GetEntitiesDto, UpdateEntityDto } from '../dtos';
 import { IPagination } from '../interfaces';
 
 export interface IBaseService<E> {

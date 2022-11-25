@@ -8,7 +8,7 @@ import {
   Max,
   Min,
 } from 'class-validator';
-import { UpdateEntityDto } from 'src/base/dto';
+import { UpdateEntityDto } from 'src/base/dtos';
 
 export class UpdateUserDto extends UpdateEntityDto {
   @IsOptional()
